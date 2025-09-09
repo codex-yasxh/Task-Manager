@@ -8,8 +8,9 @@ import {
   Pressable,
   FlatList,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeScreen = () => {
   const [task, setTask] = useState('');
@@ -30,6 +31,28 @@ const HomeScreen = () => {
   const handleAddList = () => {
     setLists([...lists, inputListName]);
   };
+
+  //useEffect for saving tasks inside Async Storage
+  //while adding it ask yourself when you need it everytime , onetime or conditionally
+  useEffect(()=>{
+    AsyncStorage.setItem("tasks",JSON.stringify(tasks))
+  },[tasks]);
+
+  //useEffect for getting tasks and removing them or loading
+  useEffect(()=>{
+    const loadTasks = async () => {
+    const storedTask = await AsyncStorage.getItem("tasks");
+    console.log(storedTask)
+    if(storedTask){
+      setTasks(JSON.parse(storedTask))
+    }
+    };
+    loadTasks()
+  },[])
+
+
+
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>📝 Task Manager</Text>
