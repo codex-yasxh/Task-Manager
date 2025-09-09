@@ -1,20 +1,35 @@
-import { StyleSheet, Text, View, ScrollView, TextInput, TouchableOpacity, Pressable } from 'react-native'
-import React, { useState } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  Pressable,
+  FlatList,
+} from 'react-native';
+import React, { useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const HomeScreen = () => {
-  const [task, setTask] = useState("")
-  const [tasks , setTasks] = useState([])
+  const [task, setTask] = useState('');
+  const [tasks, setTasks] = useState([]);
+  const [lists, setLists] = useState([]); //as it is array of list objects
+  const [inputListName, setInputListName] = useState('');
 
   const handleAddTask = () => {
-    if(task.trim() === "") return;
-    setTasks([...tasks , task]);
-    setTask("");
-  }
-  const handleRemoveTask = (index) => {
-    const newArray = tasks.filter((item,idx)=> idx !== index)
-    setTasks(newArray)
-  }
+    if (task.trim() === '') return;
+    setTasks([...tasks, task]);
+    setTask('');
+  };
+  const handleRemoveTask = index => {
+    const newArray = tasks.filter((item, idx) => idx !== index);
+    setTasks(newArray);
+  };
+
+  const handleAddList = () => {
+    setLists([...lists, inputListName]);
+  };
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>📝 Task Manager</Text>
@@ -34,28 +49,51 @@ const HomeScreen = () => {
           </TouchableOpacity>
         </View>
 
-                    {/* using map function  */}
+        {/* using map function  */}
         <View style={styles.taskContainer}>
-            <Text style={styles.taskContainerHeader}>Tasks</Text>
-            {
-                tasks.map((item,index)=>(
-                    <View style={styles.taskList} key={index}>
-                        <Text style={styles.taskListItems}>{item}</Text>
-                            
-                                <Pressable style={styles.deleteButton} onPress={()=>handleRemoveTask(index)}>
-                                    <Text>🗑️</Text>
-                                </Pressable>
+          <View style={styles.listContainer}>
+            <TextInput
+              placeholder="Enter Name of the List"
+              style={styles.textInput}
+              value={inputListName}
+              onChangeText={setInputListName}
+            />
+            <Pressable style={styles.listButtons} onPress={handleAddList}>
+              <Text>Add List +</Text>
+            </Pressable>
+          </View>
+          {lists !== null ? (
+            <FlatList
+              data={lists}
+              keyExtractor={(item, index) => index.toString()}
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              renderItem={({ item }) => (
+                <Pressable style={styles.listButtons}>
+                  <Text style={{fontSize : 20}}>{item}</Text>
+                </Pressable>
+              )}
+            />
+          ) : null}
+          {tasks.map((item, index) => (
+            <View style={styles.taskList} key={index}>
+              <Text style={styles.taskListItems}>{item}</Text>
 
-                    </View>
-                ))
-            }
+              <Pressable
+                style={styles.deleteButton}
+                onPress={() => handleRemoveTask(index)}
+              >
+                <Text>🗑️</Text>
+              </Pressable>
+            </View>
+          ))}
         </View>
       </ScrollView>
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default HomeScreen
+export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -100,32 +138,42 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#222',
   },
-  taskContainer : {
-    marginHorizontal : 10,
-    marginTop : 20
+  taskContainer: {
+    marginHorizontal: 10,
+    marginTop: 20,
   },
-  taskContainerHeader : {
-    fontSize : 24,
-    fontWeight : 600,
-    color : '#fff',
+  taskContainerHeader: {
+    fontSize: 24,
+    fontWeight: 600,
+    color: '#fff',
   },
-  taskList : {
-    marginTop : 20,
-    backgroundColor : '#318296ff',
-    borderRadius : 12,
-    flexDirection : 'row',
-    justifyContent : 'space-between',
-    alignItems : 'center',
-    paddingHorizontal : 20
+  taskList: {
+    marginTop: 20,
+    backgroundColor: '#318296ff',
+    borderRadius: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
   },
-  taskListItems : {
-    fontSize : 20,
-    color : '#fff',
-    fontWeight : 500,
-    marginVertical : 6,
-    padding : 10,
+  taskListItems: {
+    fontSize: 20,
+    color: '#fff',
+    fontWeight: 500,
+    marginVertical: 6,
+    padding: 10,
   },
-  deleteButton : {
-    
-  }
-})
+  deleteButton: {},
+  listContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  listButtons: {
+    backgroundColor: '#ffb703',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderRadius: 10,
+    marginHorizontal: 4,
+    marginTop: 6,
+  },
+});
