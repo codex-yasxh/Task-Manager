@@ -18,6 +18,11 @@ const HomeScreen = () => {
   const [lists, setLists] = useState([]); //as it is array of list objects
   const [inputListName, setInputListName] = useState('');
   const focusRef = useRef(null);
+  const prevCountRef = useRef(0);
+
+  useEffect(()=>{
+    prevCountRef.current = tasks.length;
+  },[tasks])
 
   const handleAddTask = () => {
     if (task.trim() === '') return;
@@ -31,29 +36,29 @@ const HomeScreen = () => {
 
   const handleAddList = () => {
     setLists([...lists, inputListName]);
+    setInputListName('');
   };
 
   //useEffect for saving tasks inside Async Storage
   //while adding it ask yourself when you need it everytime , onetime or conditionally
-  useEffect(()=>{
-    AsyncStorage.setItem("tasks",JSON.stringify(tasks))
-  },[tasks]);
+  useEffect(() => {
+    AsyncStorage.setItem('tasks', JSON.stringify(tasks));
+  }, [tasks]);
 
   //useEffect for getting tasks and removing them or loading
-  useEffect(()=>{
+  useEffect(() => {
     const loadTasks = async () => {
-    const storedTask = await AsyncStorage.getItem("tasks");
-    console.log(storedTask)
-    if(storedTask){
-      setTasks(JSON.parse(storedTask))
-    }
+      const storedTask = await AsyncStorage.getItem('tasks');
+      console.log(storedTask);
+      if (storedTask) {
+        setTasks(JSON.parse(storedTask));
+      }
     };
-    loadTasks()
-  },[])
+    loadTasks();
+  }, []);
   const handleFocus = () => {
-      focusRef.current.focus();
-  }
-
+    focusRef.current.focus();
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -79,6 +84,15 @@ const HomeScreen = () => {
           <Text style={styles.addButtonText}>Focus Input</Text>
         </TouchableOpacity>
 
+        <View style={{gap : 20}}>
+          <TouchableOpacity style={styles.addButton} onPress={handleFocus}>
+          <Text style={styles.addButtonText}>Number of Tasks : {tasks.length}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.addButton} onPress={handleFocus}>
+          <Text style={styles.addButtonText}>Previous Number of Tasks : {prevCountRef.current}</Text>
+        </TouchableOpacity>
+        </View>
+
         {/* using map function  */}
         <View style={styles.taskContainer}>
           <View style={styles.listContainer}>
@@ -87,7 +101,6 @@ const HomeScreen = () => {
               style={styles.textInput}
               value={inputListName}
               onChangeText={setInputListName}
-              
             />
             <Pressable style={styles.listButtons} onPress={handleAddList}>
               <Text>Add List +</Text>
@@ -101,7 +114,7 @@ const HomeScreen = () => {
               showsHorizontalScrollIndicator={false}
               renderItem={({ item }) => (
                 <Pressable style={styles.listButtons}>
-                  <Text style={{fontSize : 20}}>{item}</Text>
+                  <Text style={{ fontSize: 20 }}>{item}</Text>
                 </Pressable>
               )}
             />
@@ -143,7 +156,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'flex-start',
-    gap : 20
+    gap: 20,
   },
   inputSection: {
     flexDirection: 'row',
