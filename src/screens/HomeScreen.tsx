@@ -8,7 +8,7 @@ import {
   Pressable,
   FlatList,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -17,6 +17,7 @@ const HomeScreen = () => {
   const [tasks, setTasks] = useState([]);
   const [lists, setLists] = useState([]); //as it is array of list objects
   const [inputListName, setInputListName] = useState('');
+  const focusRef = useRef(null);
 
   const handleAddTask = () => {
     if (task.trim() === '') return;
@@ -49,8 +50,9 @@ const HomeScreen = () => {
     };
     loadTasks()
   },[])
-
-
+  const handleFocus = () => {
+      focusRef.current.focus();
+  }
 
 
   return (
@@ -65,12 +67,17 @@ const HomeScreen = () => {
             placeholderTextColor="#aaa"
             value={task}
             onChangeText={setTask}
+            ref={focusRef}
           />
 
           <TouchableOpacity style={styles.addButton} onPress={handleAddTask}>
             <Text style={styles.addButtonText}>+ Add</Text>
           </TouchableOpacity>
         </View>
+
+        <TouchableOpacity style={styles.addButton} onPress={handleFocus}>
+          <Text style={styles.addButtonText}>Focus Input</Text>
+        </TouchableOpacity>
 
         {/* using map function  */}
         <View style={styles.taskContainer}>
@@ -80,6 +87,7 @@ const HomeScreen = () => {
               style={styles.textInput}
               value={inputListName}
               onChangeText={setInputListName}
+              
             />
             <Pressable style={styles.listButtons} onPress={handleAddList}>
               <Text>Add List +</Text>
@@ -135,6 +143,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'flex-start',
+    gap : 20
   },
   inputSection: {
     flexDirection: 'row',
@@ -163,7 +172,7 @@ const styles = StyleSheet.create({
   },
   taskContainer: {
     marginHorizontal: 10,
-    marginTop: 20,
+    marginTop: 10,
   },
   taskContainerHeader: {
     fontSize: 24,
